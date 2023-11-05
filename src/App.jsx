@@ -5,7 +5,7 @@ function App() {
   const [diceArray, setDiceArray] = useState(allNewDice());
 
   const diceElements = diceArray.map((die) => {
-    return <Die key={die} value={die} />;
+    return <Die value={die} />;
   });
 
   function allNewDice() {
@@ -16,13 +16,17 @@ function App() {
 
     return diceArr;
   }
-
+  function rollDice(){
+    setDiceArray(allNewDice())
+  }
+  console.log(diceArray)
   return (
     <main className="main">
       <div className="dice-container">
         {/* <Die value={value} /> */}
         {diceElements}
       </div>
+      <button className="btn" onClick={rollDice}>Roll</button>
     </main>
   );
 }

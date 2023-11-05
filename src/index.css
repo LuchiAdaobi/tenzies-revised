@@ -16,13 +16,14 @@ body {
 .main {
   background: #f5f5f5;
   border-radius: 2rem;
-  width: 40vw;
-  height: 400px;
+  width: 45vw;
+  height: 380px;
   margin: 0 auto;
   padding: 2rem;
   display: flex;
   justify-content: center;
   align-items: center;
+  flex-direction: column;
 }
 .dice-container {
   display: grid;
@@ -33,7 +34,7 @@ body {
 .die {
   background: #ffffff;
   color: #2b283a;
-  padding: .8rem 1.2rem;
+  padding: 0.8rem 1.2rem;
   font-size: 1.5rem;
   text-align: center;
   font-weight: bold;
@@ -41,26 +42,37 @@ body {
   border-radius: 10px;
   cursor: pointer;
 }
+.btn {
+  background-color: #5035ff;
+  color: #ffffff;
+  padding: 0.8rem 2rem;
+  border-radius: 0.9rem;
+  border: none;
+  cursor: pointer;
+  font-size: 1.2rem;
+}
+.btn:hover {
+  background-color: #3326b0;
+}
 
-
-@media only screen and (max-width : 850px){
-  .main{
-    width : 60vw;
+@media only screen and (max-width: 850px) {
+  .main {
+    width: 60vw;
   }
 }
-@media only screen and (max-width : 600px){
-  .main{
-    width : 90vw;
+@media only screen and (max-width: 600px) {
+  .main {
+    width: 90vw;
   }
 }
-@media only screen and (max-width : 400px){
-  .main{
-    width : 93vw;
+@media only screen and (max-width: 400px) {
+  .main {
+    width: 93vw;
   }
   .die {
-  background: #ffffff;
-  color: #2b283a;
-  padding: .7rem 1rem;
-  font-size: 1rem;
+    background: #ffffff;
+    color: #2b283a;
+    padding: 0.7rem 1rem;
+    font-size: 1rem;
   }
 }
