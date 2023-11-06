@@ -17,7 +17,7 @@ body {
   background: #f5f5f5;
   border-radius: 2rem;
   width: 45vw;
-  height: 380px;
+  height: 400px;
   margin: 0 auto;
   padding: 2rem;
   display: flex;
@@ -25,14 +25,26 @@ body {
   align-items: center;
   flex-direction: column;
 }
+
+.title {
+    font-size: 40px;
+    margin: 0;
+}
+
+.instructions {
+    font-family: 'Inter', sans-serif;
+    font-weight: 400;
+    margin-top: 0;
+    text-align: center;
+}
 .dice-container {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
   gap: 1rem;
-  margin: auto;
+  margin-bottom: 40px;
 }
-.die {
-  background: #ffffff;
+.die, .die-held {
+  background-color: #ffffff;
   color: #2b283a;
   padding: 0.8rem 1.2rem;
   font-size: 1.5rem;
@@ -41,6 +53,9 @@ body {
   box-shadow: 0px 2px 2px 0px #00000026;
   border-radius: 10px;
   cursor: pointer;
+}
+.die-held {
+  background: #59E391;
 }
 .btn {
   background-color: #5035ff;
