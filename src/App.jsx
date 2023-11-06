@@ -6,24 +6,52 @@ import Confetti from "react-confetti";
 function App() {
   const [diceArray, setDiceArray] = useState(allNewDice());
   const [tenzies, setTenzies] = useState(false);
-  const [notTenzies, setNotTenzies] = useState("");
+  const [notSameTenzies, setNotSameTenzies] = useState("");
+  const [majorityValue, setMajorityValue] = useState(null);
 
   useEffect(() => {
     if (!tenzies) {
-      const allHeld = diceArray.every((die) => die.isHeld);
-      const firstValue = diceArray[0].value;
+      const allHeldDice = diceArray.every((die) => die.isHeld);
+      const allHeld = diceArray.filter((die) => die.isHeld);
+      const firstValue = allHeld[0]?.value;
       const allSameValue = diceArray.every((die) => die.value === firstValue);
+      const sameValueDice = allHeld.filter((die) => die.value === firstValue);
 
-      if (allHeld && !allSameValue) {
-        setNotTenzies(
+      if (allHeld.length > 1 && sameValueDice.length === allHeld.length) {
+        setNotSameTenzies("");
+      } else if (allHeldDice && !allSameValue) {
+        setNotSameTenzies(
           "All your values are not the same. Please choose the same values"
         );
       } else {
-        setNotTenzies("");
+        setNotSameTenzies("");
       }
     }
   }, [tenzies, diceArray]);
 
+  // ... (previous code remains the same)
+
+  useEffect(() => {
+    if (!tenzies) {
+      const heldDice = diceArray.filter((die) => die.isHeld);
+      const allHeldValues = heldDice.map((die) => die.value);
+      let majorityValue = null;
+      let maxCount = 0;
+
+      const counts = allHeldValues.reduce((acc, value) => {
+        acc[value] = (acc[value] || 0) + 1;
+        if (acc[value] > maxCount) {
+          majorityValue = value;
+          maxCount = acc[value];
+        }
+        return acc;
+      }, {});
+
+      setMajorityValue(majorityValue);
+    }
+  }, [diceArray, tenzies]);
+
+  // ... (previous code remains the same)
   useEffect(() => {
     const allHeld = diceArray.every((die) => die.isHeld);
     const firstValue = diceArray[0].value;
@@ -49,6 +77,8 @@ function App() {
         value={die.value}
         isHeld={die.isHeld}
         holdDice={() => holdDice(die.id)}
+        notSameTenzies={notSameTenzies}
+        majorityValue={majorityValue}
         // id={die.id}
       />
     );
@@ -102,7 +132,7 @@ function App() {
         current value between rolls.
       </p>
       <div className="dice-container">{diceElements}</div>
-      <h3 style={{color : 'red'}}>{notTenzies}</h3>
+      <h3 style={{ color: "red" }}>{notSameTenzies}</h3>
       <button className="btn" onClick={rollDice}>
         {tenzies ? "New Game" : "Roll"}
       </button>

@@ -56,6 +56,10 @@ body {
 .die-held {
   background: #59E391;
 }
+.redBackground {
+  background: red;
+}
+
 .btn {
   background-color: #5035ff;
   color: #ffffff;
@@ -68,6 +72,7 @@ body {
 .btn:hover {
   background-color: #3326b0;
 }
+
 
 @media only screen and (max-width: 850px) {
   .main {
