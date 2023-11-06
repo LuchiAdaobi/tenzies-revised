@@ -17,7 +17,7 @@ body {
   background: #f5f5f5;
   border-radius: 2rem;
   width: 45vw;
-  height: 430px;
+  height: 450px;
   margin: 0 auto;
   padding: 2rem;
   display: flex;
@@ -42,16 +42,22 @@ body {
   grid-template-columns: repeat(5, 1fr);
   gap: 1rem;
 }
+
 .die, .die-held {
   background-color: #ffffff;
+  height: 80px;
   color: #2b283a;
   padding: 0.8rem 1.2rem;
-  font-size: 1.5rem;
+  font-size: 0;
   text-align: center;
   font-weight: bold;
   box-shadow: 0px 2px 2px 0px #00000026;
   border-radius: 10px;
   cursor: pointer;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-around;
 }
 .die-held {
   background: #59E391;
@@ -60,6 +66,14 @@ body {
   background: red;
 }
 
+.dot {
+  width: 15px;
+  height: 15px;
+  background-color: #222222;
+  display: inline-block;
+  margin: 2px ; /* Adjust the margin as needed */
+  border-radius: 50%; /* Shape the dot as a circle */
+}
 .btn {
   background-color: #5035ff;
   color: #ffffff;
@@ -102,3 +116,4 @@ body {
     font-size: 1rem;
   }
 }
+

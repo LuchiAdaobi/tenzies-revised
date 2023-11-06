@@ -3,15 +3,17 @@ export default function Die(props) {
     <section>
       <div
         className={`${props.isHeld ? "die-held" : "die"} ${
-          props.notSameTenzies && props.value !== props.majorityValue ? "redBackground" : ""
+          props.notSameTenzies && props.value !== props.majorityValue
+            ? "redBackground"
+            : ""
         }`}
         onClick={props.holdDice}
       >
-        {props.value}
+        {Array.from({ length: props.value }, (_, index) => (
+          <div key={index} className="dot"></div>
+        ))}
       </div>
     </section>
   );
 }
 
-// ${
-        //   props.isHeld && props.notTenzies ? "redBackground" : ""

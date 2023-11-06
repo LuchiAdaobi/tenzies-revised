@@ -2,12 +2,16 @@ import { useState, useEffect } from "react";
 import { nanoid } from "nanoid";
 import Die from "./components/Die";
 import Confetti from "react-confetti";
+import useWindowSize from "react-use/lib/useWindowSize";
 
 function App() {
   const [diceArray, setDiceArray] = useState(allNewDice());
   const [tenzies, setTenzies] = useState(false);
   const [notSameTenzies, setNotSameTenzies] = useState("");
   const [majorityValue, setMajorityValue] = useState(null);
+  const [bestTime, setBestTime] = useState();
+
+  const { width, height } = useWindowSize();
 
   useEffect(() => {
     if (!tenzies) {
@@ -69,6 +73,13 @@ function App() {
       id: nanoid(),
     };
   }
+  function handleBestTime() {
+     if (bestTime) {
+       setBestTime("");
+     } else {
+       setBestTime(Date.now());
+     }
+  }
 
   const diceElements = diceArray.map((die) => {
     return (
@@ -122,7 +133,7 @@ function App() {
           <h1 style={{ color: "red", margin: 0, fontSize: "45px" }}>
             You Won!
           </h1>
-          <Confetti />
+          <Confetti width={width} height={height} />
         </div>
       )}
 
@@ -137,8 +148,11 @@ function App() {
         <button className="btn" onClick={rollDice}>
           {tenzies ? "New Game" : "Roll"}
         </button>
-        <button className="btn best-time">Best Time</button>
+        <button className="btn best-time" onClick={handleBestTime}>
+          {bestTime ? 'Hide' : 'Show'} Best Time
+        </button>
       </div>
+      {bestTime && <h3 style={{color : 'green'}}>Best Time: {bestTime}</h3>}
     </main>
   );
 }
