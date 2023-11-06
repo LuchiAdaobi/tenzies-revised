@@ -133,9 +133,12 @@ function App() {
       </p>
       <div className="dice-container">{diceElements}</div>
       <h3 style={{ color: "red" }}>{notSameTenzies}</h3>
-      <button className="btn" onClick={rollDice}>
-        {tenzies ? "New Game" : "Roll"}
-      </button>
+      <div className="btn-container">
+        <button className="btn" onClick={rollDice}>
+          {tenzies ? "New Game" : "Roll"}
+        </button>
+        <button className="btn best-time">Best Time</button>
+      </div>
     </main>
   );
 }

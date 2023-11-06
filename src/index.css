@@ -68,9 +68,16 @@ body {
   border: none;
   cursor: pointer;
   font-size: 1.2rem;
+  margin-right: .6rem;
 }
 .btn:hover {
   background-color: #3326b0;
+}
+.btn.best-time{
+  background-color:#125628;
+}
+.btn.best-time:hover{
+  background-color: #073c19;
 }
 
 
