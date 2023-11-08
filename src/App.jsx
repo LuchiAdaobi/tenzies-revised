@@ -3,15 +3,105 @@ import { nanoid } from "nanoid";
 import Die from "./components/Die";
 import Confetti from "react-confetti";
 import useWindowSize from "react-use/lib/useWindowSize";
+import useGameTimer from "./components/useGameTimer";
+
+function formatTime(totalSeconds) {
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  return `${minutes}m ${seconds < 10 ? "0" : ""}${seconds}s`;
+}
 
 function App() {
   const [diceArray, setDiceArray] = useState(allNewDice());
   const [tenzies, setTenzies] = useState(false);
   const [notSameTenzies, setNotSameTenzies] = useState("");
   const [majorityValue, setMajorityValue] = useState(null);
-  const [bestTime, setBestTime] = useState();
+  const [bestTime, setBestTime] = useState(null);
+  const [rollCount, setRollCount] = useState(0);
+  const [isGameStarted, setIsGameStarted] = useState(false);
+  const [isGameReset, setIsGameReset] = useState(false);
+  const [isGameWon, setIsGameWon] = useState(false);
+  const [winTime, setWinTime] = useState(0);
+
+  // const { seconds, minutes, setSeconds, setMinutes } = useGameTimer(
+  //   isGameStarted,
+  //   isGameReset,
+  //   isGameWon,
+  //   setSeconds,
+  //   setMinutes
+  // );
+const { seconds, minutes, setSeconds, setMinutes } = useGameTimer(
+  isGameStarted,
+  isGameReset,
+  isGameWon
+);
 
   const { width, height } = useWindowSize();
+
+  useEffect(() => {
+    if (tenzies) {
+      setIsGameWon(true);
+      const firstStrokeTime = diceArray.find(
+        (die) => die.timeEnded !== 0
+      )?.timeEnded;
+      if (firstStrokeTime !== undefined) {
+        const currentTime = Date.now();
+        const timeDifference = currentTime - firstStrokeTime;
+        setWinTime(timeDifference);
+      }
+    }
+  }, [tenzies, diceArray]);
+
+  useEffect(() => {
+    const anyDiceHeld = diceArray.some((die) => die.isHeld);
+    if (!tenzies && anyDiceHeld) {
+      setIsGameStarted(true);
+    }
+  }, [tenzies, diceArray]);
+
+  useEffect(() => {
+    if (tenzies) {
+      setIsGameStarted(false);
+      setIsGameReset(true);
+      setIsGameWon(true);
+    }
+  }, [tenzies]);
+
+  // useEffect(() => {
+  //   if (isGameReset && !isGameWon) {
+  //     setSeconds(0);
+  //     setMinutes(0);
+  //     setIsGameReset(false);
+  //   }
+  // }, [isGameReset, isGameWon]);
+
+  useEffect(() => {
+    let interval;
+
+    if (isGameStarted && !isGameWon) {
+      interval = setInterval(() => {
+        setSeconds((prevSeconds) => {
+          if (prevSeconds === 59) {
+            setMinutes((prevMinutes) => prevMinutes + 1);
+            return 0;
+          } else {
+            return prevSeconds + 1;
+          }
+        });
+      }, 1000);
+    }
+
+    if (isGameWon) {
+      clearInterval(interval);
+    }
+
+    if (isGameReset && !isGameWon) {
+      setSeconds(0);
+      setMinutes(0);
+    }
+
+    return () => clearInterval(interval);
+  }, [isGameStarted, isGameWon, isGameReset, setSeconds, setMinutes]);
 
   useEffect(() => {
     if (!tenzies) {
@@ -33,8 +123,6 @@ function App() {
     }
   }, [tenzies, diceArray]);
 
-  // ... (previous code remains the same)
-
   useEffect(() => {
     if (!tenzies) {
       const heldDice = diceArray.filter((die) => die.isHeld);
@@ -55,7 +143,6 @@ function App() {
     }
   }, [diceArray, tenzies]);
 
-  // ... (previous code remains the same)
   useEffect(() => {
     const allHeld = diceArray.every((die) => die.isHeld);
     const firstValue = diceArray[0].value;
@@ -71,14 +158,19 @@ function App() {
       value: Math.ceil(Math.random() * 6),
       isHeld: false,
       id: nanoid(),
+      timeStarted: 0,
+      timeEnded: 0,
     };
   }
+
   function handleBestTime() {
-     if (bestTime) {
-       setBestTime("");
-     } else {
-       setBestTime(Date.now());
-     }
+    console.log("hello");
+  }
+
+  function formatTime(milliseconds) {
+    const minutes = Math.floor(milliseconds / 60000);
+    const seconds = ((milliseconds % 60000) / 1000).toFixed(0);
+    return `${minutes}m ${seconds < 10 ? "0" : ""}${seconds}s`;
   }
 
   const diceElements = diceArray.map((die) => {
@@ -104,25 +196,59 @@ function App() {
     return diceArr;
   }
 
+  // function handleTenzies() {
+  //   if (!tenzies) {
+  //     setTenzies(true);
+  //     getWinTime();
+  //   }
+  // }
+
   function holdDice(id) {
     setDiceArray((prev) =>
       prev.map((die) => {
-        return die.id === id ? { ...die, isHeld: !die.isHeld } : die;
+        if (die.id === id && die.isHeld) {
+          return { ...die, isHeld: false, timeEnded: Date.now() };
+        } else if (die.id === id && !die.isHeld) {
+          return { ...die, isHeld: true, timeEnded: 0 };
+        } else {
+          return die;
+        }
       })
     );
   }
 
+  const handleResetGame = () => {
+    setDiceArray(allNewDice());
+    setTenzies(false);
+    setRollCount(0);
+    setIsGameWon(false);
+    setIsGameStarted(false);
+    setIsGameReset(true);
+    console.log("I ran");
+
+    setIsGameReset(false);
+    setMinutes(0);
+    setSeconds(0);
+  };
+
   function rollDice() {
-    // setDiceArray(allNewDice());
     if (tenzies) {
       setDiceArray(allNewDice());
       setTenzies(false);
+      setRollCount(0);
+      setIsGameWon(false);
+      setIsGameStarted(false);
+      setIsGameReset(true);
+      handleResetGame();
     } else {
       setDiceArray((prev) =>
         prev.map((die) => {
           return die.isHeld ? die : generateNewDie();
         })
       );
+      setRollCount((prev) => {
+        return prev + 1;
+      });
     }
   }
 
@@ -130,7 +256,14 @@ function App() {
     <main className="main">
       {tenzies && (
         <div>
-          <h1 style={{ color: "red", margin: 0, fontSize: "45px" }}>
+          <h1
+            style={{
+              color: "red",
+              margin: 0,
+              fontSize: "40px",
+              marginTop: "1rem",
+            }}
+          >
             You Won!
           </h1>
           <Confetti width={width} height={height} />
@@ -149,10 +282,21 @@ function App() {
           {tenzies ? "New Game" : "Roll"}
         </button>
         <button className="btn best-time" onClick={handleBestTime}>
-          {bestTime ? 'Hide' : 'Show'} Best Time
+          {bestTime ? "Hide" : ""} Best Time
         </button>
       </div>
-      {bestTime && <h3 style={{color : 'green'}}>Best Time: {bestTime}</h3>}
+      <div className="game-stats">
+        <p>Roll Count : {rollCount}</p>
+        <p>
+          {isGameWon
+            ? formatTime(winTime)
+            : isGameReset
+            ? "00m 00s"
+            : `${minutes < 10 ? "0" + minutes : minutes}m ${
+                seconds < 10 ? "0" + seconds : seconds
+              }s`}
+        </p>
+      </div>
     </main>
   );
 }

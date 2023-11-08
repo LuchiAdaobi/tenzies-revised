@@ -11,13 +11,14 @@ body {
   align-items: center;
   justify-content: center;
   height: 100vh;
+  overflow: hidden;
 }
 
 .main {
   background: #f5f5f5;
   border-radius: 2rem;
   width: 45vw;
-  height: 450px;
+  height: 495px;
   margin: 0 auto;
   padding: 2rem;
   display: flex;
@@ -27,15 +28,15 @@ body {
 }
 
 .title {
-    font-size: 40px;
-    margin: 0;
+  font-size: 35px;
+  margin: 0;
 }
 
 .instructions {
-    font-family: 'Inter', sans-serif;
-    font-weight: 400;
-    margin-top: 0;
-    text-align: center;
+  font-family: "Inter", sans-serif;
+  font-weight: 400;
+  margin-top: 0;
+  text-align: center;
 }
 .dice-container {
   display: grid;
@@ -43,7 +44,8 @@ body {
   gap: 1rem;
 }
 
-.die, .die-held {
+.die,
+.die-held {
   background-color: #ffffff;
   height: 80px;
   color: #2b283a;
@@ -60,7 +62,7 @@ body {
   justify-content: space-around;
 }
 .die-held {
-  background: #59E391;
+  background: #59e391;
 }
 .redBackground {
   background: red;
@@ -71,7 +73,7 @@ body {
   height: 15px;
   background-color: #222222;
   display: inline-block;
-  margin: 2px ; /* Adjust the margin as needed */
+  margin: 2px; /* Adjust the margin as needed */
   border-radius: 50%; /* Shape the dot as a circle */
 }
 .btn {
@@ -82,38 +84,133 @@ body {
   border: none;
   cursor: pointer;
   font-size: 1.2rem;
-  margin-right: .6rem;
+  margin-right: 0.6rem;
 }
 .btn:hover {
   background-color: #3326b0;
 }
-.btn.best-time{
-  background-color:#125628;
+.btn:focus{
+  outline: none;
 }
-.btn.best-time:hover{
+.btn.best-time {
+  background-color: #125628;
+  padding: 0.8rem 2rem;
+  font-size: 1.2rem;
+}
+.btn.best-time:hover {
   background-color: #073c19;
 }
+.game-stats {
+  display: flex;
+  gap: .9rem;
+  margin-bottom: 0;
+  padding-bottom: 0;
+  font-weight: bold;
+  font-family: Arial, Helvetica, sans-serif;
+}
+.best-time-display {
+  display: block;
+  margin-top: -.5rem;
+  font-size: 1.1rem;
+}
 
-
-@media only screen and (max-width: 850px) {
+/* MEDIA QUERIES */
+@media only screen and (max-width: 1200px) {
   .main {
-    width: 60vw;
+    width: 50vw;
   }
 }
-@media only screen and (max-width: 600px) {
+
+@media only screen and (max-width: 1050px) {
   .main {
-    width: 90vw;
+    width: 55vw;
   }
 }
-@media only screen and (max-width: 400px) {
+
+@media only screen and (max-width: 950px) {
   .main {
-    width: 93vw;
+    width: 65vw;
   }
-  .die {
-    background: #ffffff;
-    color: #2b283a;
-    padding: 0.7rem 1rem;
+  .dot {
+    width: 12px;
+    height: 12px;
+  }
+  .best-time {
+    font-size: 1rem;
+  }
+   .btn, .btn.best-time {
     font-size: 1rem;
   }
 }
+@media only screen and (max-width: 750px) {
+  .main {
+    width: 75vw;
+  }
+ 
+  .die,
+  .die-held {
+    height: 68px;
+  }
+}
+@media only screen and (max-width: 640px) {
+  .main {
+    width: 85vw;
+  }
+  .die,
+  .die-held {
+    padding: 0.7rem 1rem;
+  }
+  .btn, .btn.best-time {
+    font-size: .9rem;
+  }
+}
 
+@media only screen and (max-width: 530px) {
+  .main {
+    width: 87vw;
+  }
+  .die,
+  .die-held {
+    padding: 0.7rem;
+  }
+  .dot {
+    width: 10px;
+    height: 10px;
+  }
+  .game-stats{
+    font-size: .9rem;
+  }
+}
+@media only screen and (max-width: 485px) {
+  .main {
+    padding: 1rem 0.9rem;
+  }
+
+  .die,
+  .die-held {
+    padding: 0.5rem;
+  }
+   .btn, .btn.best-time {
+    font-size: .8rem;
+  }
+}
+@media only screen and (max-width: 350px) {
+  .main {
+    padding: 1rem 0.7rem;
+    width: 90vw;
+  }
+
+  .die,
+  .die-held {
+    height: 55px;
+  }
+
+  .dot {
+    width: 7px;
+    height: 7px;
+  }
+  .btn,
+  .best-time {
+    font-size: 0.85rem;
+  }
+}
