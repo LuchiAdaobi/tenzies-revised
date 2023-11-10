@@ -16,55 +16,6 @@ function allNewDice() {
 }
 
 // 
-   {
-     bestTime !== null && (
-       <div>
-         <h3 style={{ color: "darkolivegreen" }} className="best-time-display">
-           Best Time: {formatTime(bestTime)}.
-         </h3>
-         {bestTimeDice && (
-           <p>
-             Best Time Dice ID: {bestTimeDice.id}, Time Started:{" "}
-             {formatTime(bestTimeDice.timeStarted)}, Time Ended:{" "}
-             {formatTime(bestTimeDice.timeEnded)}
-           </p>
-         )}
-       </div>
-     );
-   }
-
-  //  
-  function handleBestTime() {
-    if (bestTime) {
-      setBestTime(null);
-      setBestTimeDice(null);
-      localStorage.removeItem("bestTime");
-    } else {
-      let minTimeDiff = Infinity;
-      let bestTimeDice = null;
-      let endTime = 0;
-
-      const storedBestTime = localStorage.getItem("bestTime");
-      if (storedBestTime) {
-        setBestTime(parseInt(storedBestTime, 10));
-      }
-
-      diceArray.forEach((die) => {
-        if (die.timeEnded !== 0 && die.isHeld) {
-          let timeDiff = die.timeEnded - die.timeStarted;
-          if (timeDiff < minTimeDiff) {
-            minTimeDiff = timeDiff;
-            bestTimeDice = die;
-            endTime = die.timeEnded; // Store the end time of the winning dice
-          }
-        }
-      });
-
-      setBestTimeDice(bestTimeDice);
-      setBestTime(endTime - bestTimeDice.timeStarted); // Calculate the total time difference
-    }
-  }
-
 
   // APP.JS
   import { useState, useEffect } from "react";
@@ -184,13 +135,6 @@ function allNewDice() {
       return diceArr;
     }
 
-    // function handleTenzies() {
-    //   if (!tenzies) {
-    //     setTenzies(true);
-    //     getWinTime();
-    //   }
-    // }
-
     function holdDice(id) {
       setDiceArray((prev) =>
         prev.map((die) => {
@@ -279,59 +223,32 @@ function allNewDice() {
 
   export default App;
 
-  // GAME CODE THAT KINDA WORKS FOR TIMER
-  import { useState, useEffect } from "react";
-
-const useGameTimer = (shouldStart, shouldReset) => {
-  const [totalSeconds, setTotalSeconds] = useState(0);
-
-  useEffect(() => {
-    let interval;
-    if (shouldStart) {
-      interval = setInterval(() => {
-        setTotalSeconds((prevSeconds) => prevSeconds + 1);
-      }, 1000);
-    }
-
-    if (shouldReset) {
-      setTotalSeconds(0);
-    }
-
-    return () => clearInterval(interval);
-  }, [shouldStart, shouldReset]);
-
-  return totalSeconds;
-};
-
-// export default useGameTimer;
-
-// Another kinda working Timer code
+// game timer that works too
 import { useState, useEffect } from "react";
 
-const useGameTimer2 = (isGameStarted, isGameReset, isGameWon) => {
+const useGameTimer1 = (isGameStarted, isGameReset, isGameWon) => {
   const [seconds, setSeconds] = useState(0);
   const [minutes, setMinutes] = useState(0);
 
   useEffect(() => {
-    let interval;
-
-    const updateTimer = () => {
-      setSeconds((prevSeconds) => {
-        if (prevSeconds === 59) {
-          setMinutes((prevMinutes) => prevMinutes + 1);
-          return 0;
-        } else {
-          return prevSeconds + 1;
-        }
-      });
-    };
+    let interval = null;
 
     if (isGameStarted && !isGameWon) {
-      interval = setInterval(updateTimer, 1000);
+      interval = setInterval(() => {
+        setSeconds((prevSeconds) => {
+          if (prevSeconds === 59) {
+            setMinutes((prevMinutes) => prevMinutes + 1);
+            return 0;
+          } else {
+            return prevSeconds + 1;
+          }
+        });
+      }, 10000);
     }
 
-    if (isGameWon || isGameReset) {
-      clearInterval(interval);
+    if (isGameReset && !isGameWon) {
+      setSeconds(0);
+      setMinutes(0);
     }
 
     return () => clearInterval(interval);

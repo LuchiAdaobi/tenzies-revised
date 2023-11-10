@@ -5,11 +5,6 @@ import Confetti from "react-confetti";
 import useWindowSize from "react-use/lib/useWindowSize";
 import useGameTimer from "./components/useGameTimer";
 
-function formatTime(totalSeconds) {
-  const minutes = Math.floor(totalSeconds / 60);
-  const seconds = totalSeconds % 60;
-  return `${minutes}m ${seconds < 10 ? "0" : ""}${seconds}s`;
-}
 
 function App() {
   const [diceArray, setDiceArray] = useState(allNewDice());
@@ -26,17 +21,16 @@ function App() {
   // const { seconds, minutes, setSeconds, setMinutes } = useGameTimer(
   //   isGameStarted,
   //   isGameReset,
-  //   isGameWon,
-  //   setSeconds,
-  //   setMinutes
+  //   isGameWon
   // );
-const { seconds, minutes, setSeconds, setMinutes } = useGameTimer(
-  isGameStarted,
-  isGameReset,
-  isGameWon
-);
 
   const { width, height } = useWindowSize();
+  const { seconds, minutes, setTotalSeconds } = useGameTimer(
+    isGameStarted,
+    isGameReset,
+    isGameWon
+  );
+
 
   useEffect(() => {
     if (tenzies) {
@@ -67,27 +61,13 @@ const { seconds, minutes, setSeconds, setMinutes } = useGameTimer(
     }
   }, [tenzies]);
 
-  // useEffect(() => {
-  //   if (isGameReset && !isGameWon) {
-  //     setSeconds(0);
-  //     setMinutes(0);
-  //     setIsGameReset(false);
-  //   }
-  // }, [isGameReset, isGameWon]);
-
+  
   useEffect(() => {
     let interval;
 
     if (isGameStarted && !isGameWon) {
       interval = setInterval(() => {
-        setSeconds((prevSeconds) => {
-          if (prevSeconds === 59) {
-            setMinutes((prevMinutes) => prevMinutes + 1);
-            return 0;
-          } else {
-            return prevSeconds + 1;
-          }
-        });
+        setTotalSeconds((prevTotalSeconds) => prevTotalSeconds + 1);
       }, 1000);
     }
 
@@ -96,12 +76,39 @@ const { seconds, minutes, setSeconds, setMinutes } = useGameTimer(
     }
 
     if (isGameReset && !isGameWon) {
-      setSeconds(0);
-      setMinutes(0);
+      setTotalSeconds(0);
     }
 
     return () => clearInterval(interval);
-  }, [isGameStarted, isGameWon, isGameReset, setSeconds, setMinutes]);
+  }, [isGameStarted, isGameWon, isGameReset, setTotalSeconds]);
+
+  // useEffect(() => {
+  //   let interval;
+
+  //   if (isGameStarted && !isGameWon) {
+  //     interval = setInterval(() => {
+  //       setSeconds((prevSeconds) => {
+  //         if (prevSeconds === 59) {
+  //           setMinutes((prevMinutes) => prevMinutes + 1);
+  //           return 0;
+  //         } else {
+  //           return prevSeconds + 1;
+  //         }
+  //       });
+  //     }, 1000);
+  //   }
+
+  //   if (isGameWon) {
+  //     clearInterval(interval);
+  //   }
+
+  //   if (isGameReset && isGameWon) {
+  //     setSeconds(0);
+  //     setMinutes(0);
+  //   }
+
+  //   return () => clearInterval(interval);
+  // }, [isGameStarted, isGameWon, isGameReset, setSeconds, setMinutes]);
 
   useEffect(() => {
     if (!tenzies) {
@@ -164,6 +171,7 @@ const { seconds, minutes, setSeconds, setMinutes } = useGameTimer(
   }
 
   function handleBestTime() {
+    setBestTime((prev) => !prev);
     console.log("hello");
   }
 
@@ -196,13 +204,6 @@ const { seconds, minutes, setSeconds, setMinutes } = useGameTimer(
     return diceArr;
   }
 
-  // function handleTenzies() {
-  //   if (!tenzies) {
-  //     setTenzies(true);
-  //     getWinTime();
-  //   }
-  // }
-
   function holdDice(id) {
     setDiceArray((prev) =>
       prev.map((die) => {
@@ -224,11 +225,13 @@ const { seconds, minutes, setSeconds, setMinutes } = useGameTimer(
     setIsGameWon(false);
     setIsGameStarted(false);
     setIsGameReset(true);
-    console.log("I ran");
 
+    setWinTime(0);
+    // setDisplayTime(0);
     setIsGameReset(false);
-    setMinutes(0);
-    setSeconds(0);
+    setTotalSeconds(0);
+    // setMinutes(0);
+    // setSeconds(0);
   };
 
   function rollDice() {
@@ -285,18 +288,29 @@ const { seconds, minutes, setSeconds, setMinutes } = useGameTimer(
           {bestTime ? "Hide" : ""} Best Time
         </button>
       </div>
-      <div className="game-stats">
-        <p>Roll Count : {rollCount}</p>
-        <p>
-          {isGameWon
-            ? formatTime(winTime)
-            : isGameReset
-            ? "00m 00s"
-            : `${minutes < 10 ? "0" + minutes : minutes}m ${
-                seconds < 10 ? "0" + seconds : seconds
-              }s`}
-        </p>
-      </div>
+
+      {bestTime ? (
+        <div className="game-stats" style={{ color: "#19723d" }}>
+          <p>All time Best : {formatTime(winTime)}.</p>
+          <p>Rolls : {rollCount}</p>
+        </div>
+      ) : (
+        <div className="game-stats">
+          <p>Roll Count : {rollCount}</p>
+
+          <p>
+            {" "}
+            Elapsed time:
+            {isGameWon
+              ? formatTime(winTime)
+              : isGameReset
+              ? "00m 00s"
+              : `${minutes < 10 ? "0" + minutes : minutes}m ${
+                  seconds < 10 ? "0" + seconds : seconds
+                }s`}
+          </p>
+        </div>
+      )}
     </main>
   );
 }
