@@ -5,7 +5,6 @@ import Confetti from "react-confetti";
 import useWindowSize from "react-use/lib/useWindowSize";
 import useGameTimer from "./components/useGameTimer";
 
-
 function App() {
   const [diceArray, setDiceArray] = useState(allNewDice());
   const [tenzies, setTenzies] = useState(false);
@@ -30,7 +29,6 @@ function App() {
     isGameReset,
     isGameWon
   );
-
 
   useEffect(() => {
     if (tenzies) {
@@ -61,7 +59,6 @@ function App() {
     }
   }, [tenzies]);
 
-  
   useEffect(() => {
     let interval;
 
@@ -122,7 +119,7 @@ function App() {
         setNotSameTenzies("");
       } else if (allHeldDice && !allSameValue) {
         setNotSameTenzies(
-          "All your values are not the same. Please choose the same values"
+          "Please pick same dice"
         );
       } else {
         setNotSameTenzies("");
@@ -289,28 +286,27 @@ function App() {
         </button>
       </div>
 
-      {bestTime ? (
-        <div className="game-stats" style={{ color: "#19723d" }}>
+      <div className="game-stats">
+        <p>Roll Count : {rollCount}</p>
+        <p>
+          {" "}
+          Elapsed time:
+          {isGameWon
+            ? formatTime(winTime)
+            : isGameReset
+            ? "00m 00s"
+            : `${minutes < 10 ? "0" + minutes : minutes}m ${
+                seconds < 10 ? "0" + seconds : seconds
+              }s`}
+        </p>
+
+        </div>
+        {bestTime && 
+        <div className="win-stats" style={{ color: "#19723d" }}>
           <p>All time Best : {formatTime(winTime)}.</p>
           <p>Rolls : {rollCount}</p>
         </div>
-      ) : (
-        <div className="game-stats">
-          <p>Roll Count : {rollCount}</p>
-
-          <p>
-            {" "}
-            Elapsed time:
-            {isGameWon
-              ? formatTime(winTime)
-              : isGameReset
-              ? "00m 00s"
-              : `${minutes < 10 ? "0" + minutes : minutes}m ${
-                  seconds < 10 ? "0" + seconds : seconds
-                }s`}
-          </p>
-        </div>
-      )}
+        }
     </main>
   );
 }
