@@ -1,28 +1,44 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
-const useGameTimer = (isGameStarted, isGameReset, isGameWon) => {
-  const [totalSeconds, setTotalSeconds] = useState(0);
+const useGameTimer = (initiallyRunning = false) => {
+  const [running, setRunning] = useState(initiallyRunning);
+  const [time, setTime] = useState(0);
+  const interval = useRef();
 
   useEffect(() => {
-    let interval = null;
+    // Clear the interval when the component unmounts
+    return () => {
+      clearInterval(interval.current);
+    };
+  }, []);
 
-    if (isGameStarted && !isGameWon) {
-      interval = setInterval(() => {
-        setTotalSeconds((prevTotalSeconds) => prevTotalSeconds + 1);
-      }, 1000);
+  const resetTimer = () => {
+    clearInterval(interval.current);
+    setTime(0);
+    setRunning(false);
+  };
+
+  useEffect(() => {
+    if (running) {
+      const handleTick = () => {
+        setTime((prevTime) => prevTime + 1);
+      };
+      interval.current = setInterval(handleTick, 1000);
     }
 
-    if (isGameReset && isGameWon) {
-      setTotalSeconds(0);
-    }
+    // Clear the interval when the component unmounts or when the running status changes
+    return () => {
+      clearInterval(interval.current);
+    };
+  }, [running]);
 
-    return () => clearInterval(interval);
-  }, [isGameStarted, isGameWon, isGameReset]);
-
-  const seconds = totalSeconds % 60;
-  const minutes = Math.floor(totalSeconds / 60);
-
-  return { seconds, minutes, setTotalSeconds };
+  return {
+    minutes: Math.floor(time / 60),
+    seconds: time % 60,
+    isGameReset: resetTimer,
+    isGameStarted: () => setRunning(true),
+    isGameWon: () => setRunning(false),
+  };
 };
 
 export default useGameTimer;

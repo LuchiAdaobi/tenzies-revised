@@ -12,125 +12,39 @@ function App() {
   const [majorityValue, setMajorityValue] = useState(null);
   const [bestTime, setBestTime] = useState(null);
   const [rollCount, setRollCount] = useState(0);
-  const [isGameStarted, setIsGameStarted] = useState(false);
-  const [isGameReset, setIsGameReset] = useState(false);
-  const [isGameWon, setIsGameWon] = useState(false);
-  const [winTime, setWinTime] = useState(0);
-
-  // const { seconds, minutes, setSeconds, setMinutes } = useGameTimer(
-  //   isGameStarted,
-  //   isGameReset,
-  //   isGameWon
-  // );
+  const [gameState, setGameState] = useState({
+    isGameStarted: false,
+    isGameReset: false,
+    isGameWon: false,
+    winTime: 0,
+  });
 
   const { width, height } = useWindowSize();
-  const { seconds, minutes, setTotalSeconds } = useGameTimer(
-    isGameStarted,
-    isGameReset,
-    isGameWon
-  );
 
-  useEffect(() => {
-    if (tenzies) {
-      setIsGameWon(true);
-      const firstStrokeTime = diceArray.find(
-        (die) => die.timeEnded !== 0
-      )?.timeEnded;
-      if (firstStrokeTime !== undefined) {
-        const currentTime = Date.now();
-        const timeDifference = currentTime - firstStrokeTime;
-        setWinTime(timeDifference);
-      }
-    }
-  }, [tenzies, diceArray]);
+  const { minutes, seconds, isGameReset, isGameStarted, isGameWon } =
+    useGameTimer(gameState.isGameStarted);
 
+  // Determine when a game starts
   useEffect(() => {
     const anyDiceHeld = diceArray.some((die) => die.isHeld);
     if (!tenzies && anyDiceHeld) {
-      setIsGameStarted(true);
+      isGameStarted(true);
+      setGameState((prev) => ({ ...prev, isGameStarted: true }));
     }
   }, [tenzies, diceArray]);
 
-  useEffect(() => {
-    if (tenzies) {
-      setIsGameStarted(false);
-      setIsGameReset(true);
-      setIsGameWon(true);
-    }
-  }, [tenzies]);
 
-  useEffect(() => {
-    let interval;
 
-    if (isGameStarted && !isGameWon) {
-      interval = setInterval(() => {
-        setTotalSeconds((prevTotalSeconds) => prevTotalSeconds + 1);
-      }, 1000);
-    }
-
-    if (isGameWon) {
-      clearInterval(interval);
-    }
-
-    if (isGameReset && !isGameWon) {
-      setTotalSeconds(0);
-    }
-
-    return () => clearInterval(interval);
-  }, [isGameStarted, isGameWon, isGameReset, setTotalSeconds]);
-
-  // useEffect(() => {
-  //   let interval;
-
-  //   if (isGameStarted && !isGameWon) {
-  //     interval = setInterval(() => {
-  //       setSeconds((prevSeconds) => {
-  //         if (prevSeconds === 59) {
-  //           setMinutes((prevMinutes) => prevMinutes + 1);
-  //           return 0;
-  //         } else {
-  //           return prevSeconds + 1;
-  //         }
-  //       });
-  //     }, 1000);
-  //   }
-
-  //   if (isGameWon) {
-  //     clearInterval(interval);
-  //   }
-
-  //   if (isGameReset && isGameWon) {
-  //     setSeconds(0);
-  //     setMinutes(0);
-  //   }
-
-  //   return () => clearInterval(interval);
-  // }, [isGameStarted, isGameWon, isGameReset, setSeconds, setMinutes]);
-
+  // Determine majority held dice when {tenzies === true}
   useEffect(() => {
     if (!tenzies) {
       const allHeldDice = diceArray.every((die) => die.isHeld);
-      const allHeld = diceArray.filter((die) => die.isHeld);
-      const firstValue = allHeld[0]?.value;
-      const allSameValue = diceArray.every((die) => die.value === firstValue);
-      const sameValueDice = allHeld.filter((die) => die.value === firstValue);
-
-      if (allHeld.length > 1 && sameValueDice.length === allHeld.length) {
-        setNotSameTenzies("");
-      } else if (allHeldDice && !allSameValue) {
-        setNotSameTenzies(
-          "Please pick same dice"
-        );
-      } else {
-        setNotSameTenzies("");
-      }
-    }
-  }, [tenzies, diceArray]);
-
-  useEffect(() => {
-    if (!tenzies) {
       const heldDice = diceArray.filter((die) => die.isHeld);
+      const firstValue = heldDice[0]?.value;
+      const allSameValue = diceArray.every((die) => die.value === firstValue);
+      const sameValueDice = heldDice.filter((die) => die.value === firstValue);
       const allHeldValues = heldDice.map((die) => die.value);
+
       let majorityValue = null;
       let maxCount = 0;
 
@@ -144,9 +58,29 @@ function App() {
       }, {});
 
       setMajorityValue(majorityValue);
-    }
-  }, [diceArray, tenzies]);
 
+      // Set the text for when the dice isn't same
+
+      if (heldDice.length > 1 && sameValueDice.length === allHeldDice.length) {
+        setNotSameTenzies("");
+      } else if (allHeldDice && !allSameValue) {
+        setNotSameTenzies("Please pick same dice");
+      } else {
+        setNotSameTenzies("");
+      }
+
+      // Determine when dice is all held and set tenzies to true
+      if (allHeldDice && allSameValue) {
+        setTenzies(true);
+        isGameWon(true); // Stop the timer when the game is won
+      }
+    }
+  }, [diceArray, tenzies, isGameWon]);
+
+
+
+
+  // Determine when dice is all held and set tenzies to true
   useEffect(() => {
     const allHeld = diceArray.every((die) => die.isHeld);
     const firstValue = diceArray[0].value;
@@ -156,6 +90,12 @@ function App() {
       setTenzies(true);
     }
   }, [diceArray]);
+
+  // Effect hooks stop
+
+
+
+  // Functions
 
   function generateNewDie() {
     return {
@@ -177,20 +117,6 @@ function App() {
     const seconds = ((milliseconds % 60000) / 1000).toFixed(0);
     return `${minutes}m ${seconds < 10 ? "0" : ""}${seconds}s`;
   }
-
-  const diceElements = diceArray.map((die) => {
-    return (
-      <Die
-        key={die.id}
-        value={die.value}
-        isHeld={die.isHeld}
-        holdDice={() => holdDice(die.id)}
-        notSameTenzies={notSameTenzies}
-        majorityValue={majorityValue}
-        // id={die.id}
-      />
-    );
-  });
 
   function allNewDice() {
     const diceArr = [];
@@ -215,30 +141,20 @@ function App() {
     );
   }
 
-  const handleResetGame = () => {
-    setDiceArray(allNewDice());
-    setTenzies(false);
-    setRollCount(0);
-    setIsGameWon(false);
-    setIsGameStarted(false);
-    setIsGameReset(true);
-
-    setWinTime(0);
-    // setDisplayTime(0);
-    setIsGameReset(false);
-    setTotalSeconds(0);
-    // setMinutes(0);
-    // setSeconds(0);
-  };
+const handleResetGame = () => {
+  setDiceArray(allNewDice());
+  setTenzies(false);
+  setRollCount(0);
+  isGameReset(); // Use the resetTimer function directly
+  setGameState((prev) => ({
+    ...prev,
+    isGameWon: false,
+    isGameStarted: false,
+  }));
+};
 
   function rollDice() {
     if (tenzies) {
-      setDiceArray(allNewDice());
-      setTenzies(false);
-      setRollCount(0);
-      setIsGameWon(false);
-      setIsGameStarted(false);
-      setIsGameReset(true);
       handleResetGame();
     } else {
       setDiceArray((prev) =>
@@ -251,6 +167,23 @@ function App() {
       });
     }
   }
+  // Functions Ends
+  
+
+  // Die component
+  const diceElements = diceArray.map((die) => {
+    return (
+      <Die
+        key={die.id}
+        value={die.value}
+        isHeld={die.isHeld}
+        holdDice={() => holdDice(die.id)}
+        notSameTenzies={notSameTenzies}
+        majorityValue={majorityValue}
+        // id={die.id}
+      />
+    );
+  });
 
   return (
     <main className="main">
@@ -261,7 +194,7 @@ function App() {
               color: "red",
               margin: 0,
               fontSize: "40px",
-              marginTop: "1rem",
+              marginTop: ".1rem",
             }}
           >
             You Won!
@@ -289,24 +222,22 @@ function App() {
       <div className="game-stats">
         <p>Roll Count : {rollCount}</p>
         <p>
-          {" "}
-          Elapsed time:
-          {isGameWon
-            ? formatTime(winTime)
-            : isGameReset
-            ? "00m 00s"
+          Elapsed time :
+          {gameState.isGameWon
+            ? formatTime(gameState.winTime)
+            : gameState.isGameReset
+            ? " 00m 00s"
             : `${minutes < 10 ? "0" + minutes : minutes}m ${
                 seconds < 10 ? "0" + seconds : seconds
               }s`}
         </p>
-
-        </div>
-        {bestTime && 
+      </div>
+      {bestTime && (
         <div className="win-stats" style={{ color: "#19723d" }}>
-          <p>All time Best : {formatTime(winTime)}.</p>
+          <p>All time Best : {formatTime(gameState.winTime)}.</p>
           <p>Rolls : {rollCount}</p>
         </div>
-        }
+      )}
     </main>
   );
 }
