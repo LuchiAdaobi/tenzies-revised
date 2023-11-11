@@ -5,7 +5,12 @@ body {
   margin: 0;
   padding: 0;
   font-family: cursive;
-  background: #0b2434;
+  /* background: #0b2434; */
+  background-image: linear-gradient(
+    0deg,
+    rgb(247, 247, 247) 23.8%,
+    rgb(252, 221, 221) 92%
+  );
   padding: 2rem;
   display: flex;
   align-items: center;
@@ -15,8 +20,9 @@ body {
 }
 
 .main {
-  background: #f5f5f5;
+  background: #f79898;
   border-radius: 2rem;
+  box-shadow: 0 20px 20px rgba(252, 169, 169, 0.6);
   width: 45vw;
   height: 485px;
   margin: 0 auto;
@@ -66,7 +72,7 @@ body {
   background: #59e391;
 }
 .redBackground {
-  background: red;
+  background: rgb(249, 40, 40);
 }
 
 .dot {
@@ -77,9 +83,11 @@ body {
   margin: 2px; /* Adjust the margin as needed */
   border-radius: 50%; /* Shape the dot as a circle */
 }
+
 .btn {
-  background-color: #5035ff;
-  color: #ffffff;
+  /* background-color: #5035ff; */
+  background: #222;
+  color: #fff;
   padding: 0.8rem 2rem;
   border-radius: 0.9rem;
   border: none;
@@ -88,15 +96,13 @@ body {
   margin-right: 0.6rem;
 }
 .btn:hover {
-  background-color: #3326b0;
+  background-color: #070707;
 }
 .btn:focus {
   outline: none;
 }
 .btn.best-time {
-  background-color: #125628;
-  padding: 0.8rem 2rem;
-  font-size: 1.2rem;
+  background-color: #063314;
 }
 .btn.best-time:hover {
   background-color: #073c19;
@@ -108,11 +114,10 @@ body {
   margin-bottom: 0;
   padding-bottom: 0;
   font-family: cursive;
-  /* margin-top: -.5rem; */
 }
 .win-stats {
+  margin-top: -1.8rem;
   font-weight: bold;
-  margin-top: -1.9rem;
 }
 .best-time-display {
   display: block;
@@ -129,7 +134,7 @@ body {
 
 @media only screen and (max-width: 950px) {
   .main {
-    height: 478px;
+    height: 462px;
     width: 60vw;
   }
   .dot {
@@ -144,8 +149,7 @@ body {
   .best-time {
     font-size: 1rem;
   }
-  .btn,
-  .btn.best-time {
+  .btn {
     font-size: 1rem;
   }
 }
@@ -166,8 +170,7 @@ body {
     height: 65px;
     width: 65px;
   }
-  .btn,
-  .btn.best-time {
+  .btn {
     font-size: 0.9rem;
   }
 }
@@ -201,7 +204,7 @@ body {
   }
   .btn,
   .btn.best-time {
-    font-size: 0.8rem;
+    font-size: 0.75rem;
   }
 }
 @media only screen and (max-width: 350px) {
@@ -220,6 +223,7 @@ body {
   }
   .btn,
   .best-time {
-    font-size: 0.85rem;
+    font-size: 0.7rem;
   }
+ 
 }

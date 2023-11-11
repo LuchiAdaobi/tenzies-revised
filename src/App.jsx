@@ -26,8 +26,6 @@ function App() {
 
   const { bestTime, bestRollCount, updateBestTime } = useBestTime();
 
-
-
   const { width, height } = useWindowSize();
 
   // Determine when a game starts
@@ -38,8 +36,6 @@ function App() {
       setGameState((prev) => ({ ...prev, isGameStarted: true }));
     }
   }, [tenzies, diceArray]);
-
-
 
   // Determine when dice is all held and set tenzies to true
   useEffect(() => {
@@ -56,6 +52,12 @@ function App() {
 
   // Functions
 
+  function formatTime(milliseconds) {
+    const minutes = Math.floor(milliseconds / 60000);
+    const seconds = ((milliseconds % 60000) / 1000).toFixed(0);
+    return `${minutes}m ${seconds < 10 ? "0" : ""}${seconds}s`;
+  }
+
   function generateNewDie() {
     return {
       value: Math.ceil(Math.random() * 6),
@@ -64,12 +66,6 @@ function App() {
       timeStarted: 0,
       timeEnded: 0,
     };
-  }
-
-  function formatTime(milliseconds) {
-    const minutes = Math.floor(milliseconds / 60000);
-    const seconds = ((milliseconds % 60000) / 1000).toFixed(0);
-    return `${minutes}m ${seconds < 10 ? "0" : ""}${seconds}s`;
   }
 
   function allNewDice() {
@@ -144,13 +140,6 @@ function App() {
       localStorage.setItem("bestRollCount", newRollCount.toString());
     }
 
-    console.log(
-      "Game won! New win time:",
-      newWinTime,
-      "New roll count:",
-      newRollCount
-    );
-
     // Call the updateBestTime function from the useBestTime hook
     updateBestTime(newWinTime, newRollCount);
   };
@@ -159,25 +148,23 @@ function App() {
   const handleBestTimeClick = () => {
     if (!currentBestTime) {
       setCurrentBestTime(
-        `Best Time: ${formatTime(
-          bestTime * 1000
-        )}, Best Roll Count: ${bestRollCount}`
+        `Time: ${formatTime(bestTime * 1000)},
+        \nRoll: ${bestRollCount}`
       );
     } else {
       setCurrentBestTime(null);
     }
   };
 
-   useTenziesLogic(
-     diceArray,
-     tenzies,
-     isGameWon,
-     setTenzies,
-     setNotSameTenzies,
-     setMajorityValue,
-     handleGameWon
-   );
-
+  useTenziesLogic(
+    diceArray,
+    tenzies,
+    isGameWon,
+    setTenzies,
+    setNotSameTenzies,
+    setMajorityValue,
+    handleGameWon
+  );
 
   // Functions Ends
 
@@ -220,7 +207,7 @@ function App() {
         current value between rolls.
       </p>
       <div className="dice-container">{diceElements}</div>
-      <h3 style={{ color: "red" }}>{notSameTenzies}</h3>
+      <h3 style={{ color: "#f83131" }}>{notSameTenzies}</h3>
       <div className="btn-container">
         <button className="btn" onClick={rollDice}>
           {tenzies ? "New Game" : "Roll"}
@@ -231,8 +218,8 @@ function App() {
       </div>
 
       <div className="game-stats">
-        <p>Roll Count : {rollCount}</p>
-        <p>
+        <p className="roll-count">Roll Count : {rollCount}</p>
+        <p className="elapsed-time">
           Elapsed time :
           {gameState.isGameWon
             ? formatTime(gameState.winTime)
