@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState} from "react";
 
 const useBestTime = () => {
   const [bestTime, setBestTime] = useState(
@@ -6,7 +6,6 @@ const useBestTime = () => {
     parseInt(localStorage.getItem("bestTime")) || 0
   );
   const [bestRollCount, setBestRollCount] = useState(
-    // Provide a default value (0) if there is no value in local storage
     parseInt(localStorage.getItem("bestRollCount")) || 0
   );
 

@@ -5,13 +5,6 @@ const useGameTimer = (initiallyRunning = false) => {
   const [time, setTime] = useState(0);
   const interval = useRef();
 
-  useEffect(() => {
-    // Clear the interval when the component unmounts
-    return () => {
-      clearInterval(interval.current);
-    };
-  }, []);
-
   const resetTimer = () => {
     clearInterval(interval.current);
     setTime(0);

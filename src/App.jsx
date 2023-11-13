@@ -8,6 +8,7 @@ import useBestTime from "./components/useBestTime";
 import useTenziesLogic from "./components/useTenziesLogic";
 
 function App() {
+  // useState
   const [diceArray, setDiceArray] = useState(allNewDice());
   const [tenzies, setTenzies] = useState(false);
   const [notSameTenzies, setNotSameTenzies] = useState("");
@@ -18,15 +19,35 @@ function App() {
     isGameStarted: false,
     isGameReset: false,
     isGameWon: false,
-    winTime: 0,
   });
 
+  // custom Hook
   const { minutes, seconds, isGameReset, isGameStarted, isGameWon } =
     useGameTimer(gameState.isGameStarted);
 
   const { bestTime, bestRollCount, updateBestTime } = useBestTime();
 
   const { width, height } = useWindowSize();
+
+  // useEffect
+
+  // Determine when dice is all held and set tenzies to true
+  useEffect(() => {
+    const allHeld = diceArray.every((die) => die.isHeld);
+
+    if (allHeld) {
+      const firstValue = diceArray[0].value;
+      const allSameValue = diceArray.every((die) => die.value === firstValue);
+
+      if (allSameValue) {
+        setTenzies(true);
+        // stop timer when game is won
+        isGameWon();
+        // function that handles all time bestTime & rollCount
+        handleGameWon();
+      }
+    }
+  }, [diceArray, tenzies]);
 
   // Determine when a game starts
   useEffect(() => {
@@ -36,17 +57,6 @@ function App() {
       setGameState((prev) => ({ ...prev, isGameStarted: true }));
     }
   }, [tenzies, diceArray]);
-
-  // Determine when dice is all held and set tenzies to true
-  useEffect(() => {
-    const allHeld = diceArray.every((die) => die.isHeld);
-    const firstValue = diceArray[0].value;
-    const allSameValue = diceArray.every((die) => die.value === firstValue);
-
-    if (allHeld && allSameValue) {
-      setTenzies(true);
-    }
-  }, [diceArray]);
 
   // Effect hooks stop
 
@@ -63,8 +73,6 @@ function App() {
       value: Math.ceil(Math.random() * 6),
       isHeld: false,
       id: nanoid(),
-      timeStarted: 0,
-      timeEnded: 0,
     };
   }
 
@@ -81,9 +89,9 @@ function App() {
     setDiceArray((prev) =>
       prev.map((die) => {
         if (die.id === id && die.isHeld) {
-          return { ...die, isHeld: false, timeEnded: Date.now() };
+          return { ...die, isHeld: false };
         } else if (die.id === id && !die.isHeld) {
-          return { ...die, isHeld: true, timeEnded: 0 };
+          return { ...die, isHeld: true };
         } else {
           return die;
         }
@@ -95,26 +103,21 @@ function App() {
     setDiceArray(allNewDice());
     setTenzies(false);
     setRollCount(0);
-    isGameReset(); // Use the resetTimer function directly
-    setGameState((prev) => ({
-      ...prev,
-      isGameWon: false,
-      isGameStarted: false,
-    }));
+    isGameReset();
+    isGameWon();
   };
 
   function rollDice() {
     if (tenzies) {
       handleResetGame();
     } else {
-      setDiceArray((prev) =>
-        prev.map((die) => {
-          return die.isHeld ? die : generateNewDie();
-        })
-      );
-      setRollCount((prev) => {
-        return prev + 1;
-      });
+      // Check if not all dice are held before incrementing the roll count
+      if (!diceArray.every((die) => die.isHeld)) {
+        setDiceArray((prev) =>
+          prev.map((die) => (die.isHeld ? die : generateNewDie()))
+        );
+        setRollCount((prev) => prev + 1);
+      }
     }
   }
 
@@ -148,8 +151,8 @@ function App() {
   const handleBestTimeClick = () => {
     if (!currentBestTime) {
       setCurrentBestTime(
-        `Time: ${formatTime(bestTime * 1000)},
-        \nRoll: ${bestRollCount}`
+        `Best Time: ${formatTime(bestTime * 1000)},
+        \nRolls: ${bestRollCount}`
       );
     } else {
       setCurrentBestTime(null);
@@ -160,7 +163,6 @@ function App() {
     diceArray,
     tenzies,
     isGameWon,
-    setTenzies,
     setNotSameTenzies,
     setMajorityValue,
     handleGameWon
@@ -178,7 +180,6 @@ function App() {
         holdDice={() => holdDice(die.id)}
         notSameTenzies={notSameTenzies}
         majorityValue={majorityValue}
-        // id={die.id}
       />
     );
   });
@@ -213,7 +214,7 @@ function App() {
           {tenzies ? "New Game" : "Roll"}
         </button>
         <button className="btn best-time" onClick={handleBestTimeClick}>
-          {currentBestTime ? "Hide" : "Best Time"}
+          {currentBestTime ? "Hide Time" : "Best Time"}
         </button>
       </div>
 
@@ -222,7 +223,7 @@ function App() {
         <p className="elapsed-time">
           Elapsed time :
           {gameState.isGameWon
-            ? formatTime(gameState.winTime)
+            ? formatTime(minutes * 60 + seconds)
             : gameState.isGameReset
             ? " 00m 00s"
             : `${minutes < 10 ? " 0" + minutes : minutes}m ${
