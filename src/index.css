@@ -218,12 +218,13 @@ body {
   .main {
     padding: 1rem 0.7rem;
     width: 90vw;
-    height: 425px;
+    height: 405px;
   }
   .die,
   .die-held {
     height: 43px;
     width: 43px;
+    padding: .2rem;
   }
   .dot {
     width: 7px;
