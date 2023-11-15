@@ -220,6 +220,7 @@ body {
     padding: 1rem 0.7rem;
     width: 90vw;
     height: 70vh;
+    margin-top: 4rem;
   }
   .die,
   .die-held {
